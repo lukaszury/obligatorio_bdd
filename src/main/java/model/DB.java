@@ -4,12 +4,14 @@
  */
 package model;
 
+import helper.HashHelper;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,11 +25,13 @@ public class DB {
     private String db_user = "lukas";
     private String db_pass = "q1w2e3r4";
     private Connection conn = null;
+    private HashHelper hashHelper = null;
 
     public DB() throws SQLException {
         conn = DriverManager.getConnection(url, db_user, db_pass);
         cargarDatos();
         conn.close();
+        hashHelper = new HashHelper();
     }
 
     private void cargarDatos() {
@@ -178,8 +182,8 @@ public class DB {
                         + "apellidos TEXT NOT NULL,"
                         + "direccion TEXT NOT NULL,"
                         + "ciudad TEXT NOT NULL,"
-                        + "apartamento TEXT NOT NULL,"
-                        + "hashpwd TEXT NOT NULL,"
+                        + "departamento TEXT NOT NULL,"
+                        + "hashpwd TEXT NOT NULL UNIQUE,"
                         + "PRIMARY KEY(user_id))");
                 stm.close();
             }
@@ -194,8 +198,8 @@ public class DB {
             if (!existeTabla("personas_preguntas")) {
                 Statement stm = conn.createStatement();
                 stm.executeUpdate("CREATE TABLE  personas_preguntas ( "
-                        + "user_id int,"
-                        + "preg_id int,"
+                        + "user_id int NOT NULL,"
+                        + "preg_id int NOT NULL,"
                         + "respuesta TEXT NOT NULL,"
                         + "FOREIGN KEY(user_id) REFERENCES personas(user_id),"
                         + "FOREIGN KEY(preg_id) REFERENCES preguntas(preg_id))");
@@ -229,10 +233,11 @@ public class DB {
     }
 
     public boolean verificarUsuario(String user, String pass) {
+        String hashpwd = hashHelper.crypt(pass, user);
         try {
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
-            String query = String.format("SELECT (count(*) > 0) AS usuario FROM personas WHERE (nombres = '%s' AND hashpwd = '%s')", user, pass);
+            String query = String.format("SELECT (count(*) > 0) AS usuario FROM personas WHERE (nombres = '%s' AND hashpwd = '%s')", user, hashpwd);
             ResultSet rs = stm.executeQuery(query);
             if (rs.next()) {
                 boolean encontrado = rs.getBoolean(1);
@@ -248,6 +253,66 @@ public class DB {
             ex.printStackTrace();
         }
         return false;
+    }
+
+    public boolean registrarUsuario(String nombre, String apellido, String direccion, String ciudad, String departamento, String hashpwd, int rol, int pregunta, String respuesta) {
+        int id = -1;
+        boolean compleado = false;
+        try {
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            hashpwd = hashHelper.crypt(hashpwd, nombre);
+            String query = String.format("INSERT INTO personas (nombres, apellidos, direccion, ciudad, departamento, hashpwd) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')", nombre, apellido, direccion, ciudad, departamento, hashpwd);
+            stm.executeUpdate(query);
+            query = String.format("SELECT user_id FROM personas WHERE hashpwd = '%s'", hashpwd);
+            ResultSet rs = stm.executeQuery(query);
+            while (rs.next()) {
+                id = Integer.parseInt(rs.getString(1));
+                System.out.println(id);
+            }
+            String hashres = hashHelper.crypt(respuesta, nombre);
+            System.out.println(pregunta);
+            query = String.format("INSERT INTO personas_preguntas (user_id, preg_id, respuesta) VALUES (%d, %d, '%s')", id, pregunta, hashres);
+            stm.executeUpdate(query);
+            stm.close();
+            conn.close();
+            compleado = true;
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return compleado;
+    }
+
+    public ArrayList<String> obtenerPreguntas() {
+        ArrayList<String> data = new ArrayList<String>();
+        try {
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            ResultSet rs = stm.executeQuery("SELECT * FROM preguntas");
+            while (rs.next()) {
+                String item = rs.getString("preg_id") + " - " + rs.getString("pregunta");
+                data.add(item);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return data;
+    }
+    
+    public ArrayList<String> obtenerRoles() {
+        ArrayList<String> data = new ArrayList<String>();
+        try {
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            ResultSet rs = stm.executeQuery("SELECT * FROM roles_negocio");
+            while (rs.next()) {
+                String item = rs.getString("rol_neg_id") + " - " + rs.getString("descripcion_rol_neg");
+                data.add(item);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return data;
     }
 
     private boolean existeTabla(String nombre) throws SQLException {
