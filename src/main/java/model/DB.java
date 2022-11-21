@@ -22,8 +22,8 @@ import java.util.logging.Logger;
 public class DB {
 
     private String url = "jdbc:mariadb://localhost:3306/obligatorio";
-    private String db_user = "lukas";
-    private String db_pass = "q1w2e3r4";
+    private String db_user = "root";
+    private String db_pass = "root";
     private Connection conn = null;
     private HashHelper hashHelper = null;
 
@@ -121,7 +121,7 @@ public class DB {
                 stm.executeUpdate("CREATE TABLE  roles_aplicativos ( "
                         + "app_id int,"
                         + "rol_id int NOT NULL AUTO_INCREMENT,"
-                        + "descripcion_menu TEXT NOT NULL, "
+                        + "descripcion_rol TEXT NOT NULL, "
                         + "PRIMARY KEY(rol_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id))");
                 stm.close();
@@ -232,18 +232,24 @@ public class DB {
         }
     }
 
-    public boolean verificarUsuario(String user, String pass) {
+    public boolean verificarUsuario(String user, String pass, UserSession userSession) {
         String hashpwd = hashHelper.crypt(pass, user);
         try {
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
-            String query = String.format("SELECT (count(*) > 0) AS usuario FROM personas WHERE (nombres = '%s' AND hashpwd = '%s')", user, hashpwd);
+            String query = String.format("SELECT * FROM personas WHERE (nombres = '%s' AND hashpwd = '%s')", user, hashpwd);
             ResultSet rs = stm.executeQuery(query);
             if (rs.next()) {
                 boolean encontrado = rs.getBoolean(1);
                 stm.close();
                 conn.close();
                 if (encontrado) {
+                    userSession.setUser_id(rs.getInt(1));
+                    userSession.setNombres(rs.getString(2));
+                    userSession.setApellidos(rs.getString(3));
+                    userSession.setDireccion(rs.getString(4));
+                    userSession.setCiudad(rs.getString(5));
+                    userSession.setApartamento(rs.getString(6));
                     return true;
                 } else {
                     return false;
@@ -319,5 +325,14 @@ public class DB {
         DatabaseMetaData dbm = conn.getMetaData();
         ResultSet tables = dbm.getTables(null, null, nombre, null);
         return tables.next();
+    }
+    
+    public Connection getConnection() {
+        try {
+            return DriverManager.getConnection(url, db_user, db_pass);
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 }
