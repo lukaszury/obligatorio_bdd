@@ -104,7 +104,7 @@ public class DB {
                         + "app_id int,"
                         + "menu_id int NOT NULL AUTO_INCREMENT,"
                         + "descripcion_menu TEXT NOT NULL, "
-                        + "PRIMARY KEY(menu_id),"
+                        + "PRIMARY KEY(menu_id, app_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id))");
                 stm.close();
             }
@@ -122,7 +122,7 @@ public class DB {
                         + "app_id int,"
                         + "rol_id int NOT NULL AUTO_INCREMENT,"
                         + "descripcion_rol TEXT NOT NULL, "
-                        + "PRIMARY KEY(rol_id),"
+                        + "PRIMARY KEY(rol_id, app_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id))");
                 stm.close();
             }
@@ -139,11 +139,11 @@ public class DB {
                 stm.executeUpdate("CREATE TABLE  roles_aplicativos_menu ( "
                         + "app_id int,"
                         + "rol_id int,"
-                        + "menu_id int NOT NULL AUTO_INCREMENT,"
-                        + "descripcion_menu TEXT NOT NULL, "
-                        + "PRIMARY KEY(menu_id),"
+                        + "menu_id int,"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id),"
-                        + "FOREIGN KEY(rol_id) REFERENCES roles_aplicativos(rol_id))");
+                        + "FOREIGN KEY(rol_id) REFERENCES roles_aplicativos(rol_id),"
+                        + "FOREIGN KEY(menu_id) REFERENCES aplicativos_menu(menu_id),"
+                        + "PRIMARY KEY(app_id, rol_id, menu_id))");
                 stm.close();
             }
         } catch (SQLException e) {
@@ -160,7 +160,7 @@ public class DB {
                         + "rol_neg_id int,"
                         + "app_id int,"
                         + "rol_id int,"
-                        + "descripcion_menu TEXT NOT NULL,"
+                        + "PRIMARY KEY (rol_neg_id, app_id, rol_id),"
                         + "FOREIGN KEY(rol_neg_id) REFERENCES roles_negocio(rol_neg_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id),"
                         + "FOREIGN KEY(rol_id) REFERENCES roles_aplicativos(rol_id))");
@@ -201,6 +201,7 @@ public class DB {
                         + "user_id int NOT NULL,"
                         + "preg_id int NOT NULL,"
                         + "respuesta TEXT NOT NULL,"
+                        + "PRIMARY KEY(user_id, preg_id),"
                         + "FOREIGN KEY(user_id) REFERENCES personas(user_id),"
                         + "FOREIGN KEY(preg_id) REFERENCES preguntas(preg_id))");
                 stm.close();
@@ -215,13 +216,14 @@ public class DB {
             System.out.println("Permisos");
             if (!existeTabla("permisos")) {
                 Statement stm = conn.createStatement();
-                stm.executeUpdate("CREATE TABLE  permisos ( "
+                stm.executeUpdate("CREATE TABLE  permisos ("
                         + "user_id int,"
                         + "app_id int,"
                         + "rol_neg_id int,"
-                        + "fecha_solicitud DATE NOT NULL, "
-                        + "fecha_autorizacion DATE NOT NULL, "
+                        + "fecha_solicitud DATE NOT NULL,"
+                        + "fecha_autorizacion DATE,"
                         + "estado TEXT NOT NULL,"
+                        + "PRIMARY KEY(user_id, app_id, rol_neg_id),"
                         + "FOREIGN KEY(user_id) REFERENCES personas(user_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id),"
                         + "FOREIGN KEY(rol_neg_id) REFERENCES roles_negocio(rol_neg_id))");
@@ -326,7 +328,7 @@ public class DB {
         ResultSet tables = dbm.getTables(null, null, nombre, null);
         return tables.next();
     }
-    
+
     public Connection getConnection() {
         try {
             return DriverManager.getConnection(url, db_user, db_pass);
