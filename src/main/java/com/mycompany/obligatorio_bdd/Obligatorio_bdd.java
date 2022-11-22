@@ -5,6 +5,7 @@
 
 package com.mycompany.obligatorio_bdd;
 
+import helper.HashHelper;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -22,6 +23,8 @@ public class Obligatorio_bdd {
         FrmLogin frm = new FrmLogin();
         frm.setVisible(true);
         DB db = new DB();
+        HashHelper hh = new HashHelper();
+        System.out.println(hh.crypt("asd", "lucas"));
         
 //        Connection conn = null;
 //        
