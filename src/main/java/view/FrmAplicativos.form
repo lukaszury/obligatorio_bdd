@@ -82,8 +82,7 @@
         <Component class="javax.swing.JTable" name="tableMenus">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="2" rowCount="0">
-                <Column editable="false" title="Nombre app" type="java.lang.Object"/>
+              <Table columnCount="1" rowCount="0">
                 <Column editable="false" title="Men&#xfa;" type="java.lang.Object"/>
               </Table>
             </Property>

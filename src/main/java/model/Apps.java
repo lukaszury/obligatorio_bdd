@@ -6,7 +6,6 @@ package model;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -52,22 +51,20 @@ public class Apps {
 
     public DefaultTableModel getUserAppMenus(int user_id, int app_id) {
         DefaultTableModel resultado = new DefaultTableModel();
-        resultado.addColumn("Nombre app");
         resultado.addColumn("Menú");
         try {
             Connection conn = db.getConnection();
             Statement stm = conn.createStatement();
-            String query = String.format("SELECT * FROM view_menus_autorizados WHERE estado = 'APROBADO' AND user_id = %s AND app_id = %s", user_id, app_id);
+            String query = String.format("SELECT descripcion_menu FROM view_menus_autorizados WHERE estado = 'APROBADO' AND user_id = %s AND app_id = %s", user_id, app_id);
             ResultSet rs = stm.executeQuery(query);
             while (rs.next()) {
-                String[] row = new String[2];
-                row[0] = rs.getString("nombreapp");
-                row[1] = rs.getString("descripcion_menu");
+                String[] row = new String[1];
+                row[0] = rs.getString("descripcion_menu");
                 resultado.addRow(row);
             }
             rs.close();
             conn.close();
-        } catch (SQLException e) {
+        } catch (SQLException ex) {
             Logger.getLogger(Apps.class.getName()).log(Level.SEVERE, null, ex);
         }
         return resultado;
