@@ -5,6 +5,9 @@
 package controller;
 
 import java.util.ArrayList;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.table.DefaultTableModel;
+import model.App;
 import model.Apps;
 import model.DB;
 import view.FrmAplicativos;
@@ -17,16 +20,21 @@ public class AppsController {
 
     private FrmAplicativos ui;
     private DB db;
+    private Apps apps;
 
     public AppsController(FrmAplicativos ui) {
         this.ui = ui;
+        this.apps = new Apps();
     }
     
     public void loadCbxApps(int user_id) {
-        Apps apps = new Apps();
-        ArrayList<String> data = apps.getUserApps(user_id);
-        for (String s : data) {
-            ui.addCbxAppsItem(s);
-        }
+        ArrayList<App> data = this.apps.getUserApps(user_id);
+        DefaultComboBoxModel model = new DefaultComboBoxModel(data.toArray());
+        ui.setCbxAppsModel(model);
+    }
+    
+    public void loadTableWithMenuItems(int user_id, int app_id) {
+        DefaultTableModel model = this.apps.getUserAppMenus(user_id, app_id);
+        ui.setTableMenusModel(model);
     }
 }
