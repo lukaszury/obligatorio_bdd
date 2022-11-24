@@ -9,9 +9,12 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -300,7 +303,7 @@ public class DB {
     }
     
     public ArrayList<String> obtenerRoles() {
-        ArrayList<String> data = new ArrayList<String>();
+        ArrayList<String> data = new ArrayList<>();
         try {
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
@@ -313,6 +316,33 @@ public class DB {
             Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
         }
         return data;
+    }
+    
+    public List<Object[]> obtenerPendientes(){
+        List<Object[]> datos = new LinkedList<>();
+        try {
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            ResultSet rs = stm.executeQuery("SELECT personas.nombre, rol_negocio.descripcion,personas.personaid\n" +
+                                            "FROM personas\n" +
+                                            "join permisos\n" +
+                                            "ON personas.personaid = permisos.personaid\n" +
+                                            "join rol_negocio\n" +
+                                            "ON rol_negocio.rolid = permisos.rolid\n" +
+                                            "WHERE estado ='PENDIENTE';");
+            ResultSetMetaData rsMetaData = rs.getMetaData();
+            int columnas = rsMetaData.getColumnCount();
+            while (rs.next()) {
+                Object[] item = new Object[columnas];
+                for(int i =0; i < columnas; i++){
+                    item[i]=rs.getObject(columnas+1);
+                }
+                datos.add(item);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return datos;
     }
 
     private boolean existeTabla(String nombre) throws SQLException {

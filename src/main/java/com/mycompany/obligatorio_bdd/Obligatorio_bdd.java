@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import model.DB;
 import view.FrmLogin;
+import view.FrmManejoSolicitud;
 
 /**
  *
@@ -20,7 +21,7 @@ import view.FrmLogin;
 public class Obligatorio_bdd {
 
     public static void main(String[] args) throws SQLException {
-        FrmLogin frm = new FrmLogin();
+        FrmManejoSolicitud frm = new FrmManejoSolicitud();
         frm.setVisible(true);
         DB db = new DB();
         HashHelper hh = new HashHelper();
