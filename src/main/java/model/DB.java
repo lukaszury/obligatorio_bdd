@@ -25,8 +25,8 @@ import java.util.logging.Logger;
 public class DB {
 
     private String url = "jdbc:mariadb://localhost:3306/obligatorio";
-    private String db_user = "lukas";
-    private String db_pass = "q1w2e3r4";
+    private String db_user = "root";
+    private String db_pass = "admin";
     private Connection conn = null;
     private HashHelper hashHelper = null;
 
@@ -223,7 +223,7 @@ public class DB {
                         + "app_id int,"
                         + "rol_neg_id int,"
                         + "fecha_solicitud DATE NOT NULL, "
-                        + "fecha_autorizacion DATE NOT NULL, "
+                        + "fecha_autorizacion DATE  "
                         + "estado TEXT NOT NULL,"
                         + "FOREIGN KEY(user_id) REFERENCES personas(user_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id),"
@@ -323,19 +323,19 @@ public class DB {
         try {
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
-            ResultSet rs = stm.executeQuery("SELECT personas.nombre, rol_negocio.descripcion,personas.personaid\n" +
+            ResultSet rs = stm.executeQuery("SELECT personas.nombres, roles_negocio.descripcion_rol_neg,personas.user_id \n" +
                                             "FROM personas\n" +
                                             "join permisos\n" +
-                                            "ON personas.personaid = permisos.personaid\n" +
-                                            "join rol_negocio\n" +
-                                            "ON rol_negocio.rolid = permisos.rolid\n" +
+                                            "ON personas.user_id = permisos.user_id\n" +
+                                            "join roles_negocio\n" +
+                                            "ON roles_negocio.rol_neg_id = permisos.rol_neg_id\n" +
                                             "WHERE estado ='PENDIENTE';");
             ResultSetMetaData rsMetaData = rs.getMetaData();
             int columnas = rsMetaData.getColumnCount();
             while (rs.next()) {
                 Object[] item = new Object[columnas];
                 for(int i =0; i < columnas; i++){
-                    item[i]=rs.getObject(columnas+1);
+                    item[i]=rs.getObject(i+1);
                 }
                 datos.add(item);
             }
