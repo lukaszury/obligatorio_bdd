@@ -32,6 +32,7 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
         }
         
         cargarTabla();
+        jRadioButton2.setSelected(true);
     }
 
     /**
@@ -53,21 +54,26 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
 
         TablaSolicitudes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3"
+                "Persona", "Rol Solicitado", "Persona ID", "Roles Negocio ID"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false
+                false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        TablaSolicitudes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                TablaSolicitudesMouseClicked(evt);
             }
         });
         jScrollPane1.setViewportView(TablaSolicitudes);
@@ -78,6 +84,11 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
         jRadioButton2.setText("Negar");
 
         jButton1.setText("Confirmar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -110,6 +121,30 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void TablaSolicitudesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaSolicitudesMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_TablaSolicitudesMouseClicked
+    
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        
+        int fila = TablaSolicitudes.getSelectedRow();
+        int persona_id = Integer.parseInt(TablaSolicitudes.getValueAt(fila,2).toString());
+        int rol_id = Integer.parseInt(TablaSolicitudes.getValueAt(fila,3).toString());
+        if( jRadioButton2.isSelected()){
+            if(controlador.modificarPermiso(persona_id, rol_id,"DENEGADO")){
+             TablaSolicitudes.removeRowSelectionInterval(fila,fila);
+             
+            }
+        }else{
+            if(controlador.modificarPermiso(persona_id, rol_id,"ACTIVO")){
+                TablaSolicitudes.removeRowSelectionInterval(fila,fila);
+                
+            }
+        }
+            
+              
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -150,7 +185,8 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
         DefaultTableModel tabla = (DefaultTableModel) TablaSolicitudes.getModel();
         tabla.setRowCount(0);
         TableColumnModel colum = TablaSolicitudes.getColumnModel();
-        colum.removeColumn(colum.getColumn(2));
+       /* colum.removeColumn(colum.getColumn(3));
+        colum.removeColumn(colum.getColumn(2));*/
         List<Object[]> filas = controlador.obtenerPendientes();
         for(Object[] dato:filas){
             tabla.addRow(dato);

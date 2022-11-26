@@ -27,6 +27,9 @@ public class ManejoSolicitudController {
         return db.obtenerPendientes();
     }
     
+    public boolean modificarPermiso(int persona_id,int rol_id,String modificacion){
+        return db.modificarPermiso(persona_id,rol_id,modificacion);
+    }
     
     
 }

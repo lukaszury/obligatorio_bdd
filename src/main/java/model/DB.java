@@ -26,7 +26,7 @@ public class DB {
 
     private String url = "jdbc:mariadb://localhost:3306/obligatorio";
     private String db_user = "root";
-    private String db_pass = "admin";
+    private String db_pass = "root";
     private Connection conn = null;
     private HashHelper hashHelper = null;
 
@@ -323,7 +323,7 @@ public class DB {
         try {
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
-            ResultSet rs = stm.executeQuery("SELECT personas.nombres, roles_negocio.descripcion_rol_neg,personas.user_id \n" +
+            ResultSet rs = stm.executeQuery("SELECT personas.nombres, roles_negocio.descripcion_rol_neg,personas.user_id, roles_negocio.rol_neg_id \n" +
                                             "FROM personas\n" +
                                             "join permisos\n" +
                                             "ON personas.user_id = permisos.user_id\n" +
@@ -338,11 +338,31 @@ public class DB {
                     item[i]=rs.getObject(i+1);
                 }
                 datos.add(item);
+           
             }
+            stm.close();
+            conn.close();
         } catch (SQLException ex) {
             Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
         }
         return datos;
+    }
+    public boolean modificarPermiso(int persona_id,int rol_id,String modificacion){
+        
+         try {
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            String query = String.format("UPDATE permisos\n" +
+                                            "SET estado = '%s'\n"+
+                                            "WHERE user_id= %d AND rol_neg_id = %d ;", modificacion,persona_id,rol_id);
+            ResultSet rs=stm.executeQuery(query);
+            stm.close();
+            conn.close();
+            return true;
+         } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+         return false;
     }
 
     private boolean existeTabla(String nombre) throws SQLException {
