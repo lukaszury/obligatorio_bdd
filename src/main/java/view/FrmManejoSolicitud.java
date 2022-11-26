@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableColumn;
 import model.ManejoSolicitudInterface;
 
 /**
@@ -31,7 +31,10 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
             Logger.getLogger(FrmRegistro.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        cargarTabla();
+        cargarTablaSolicitudes();
+        esconderColumna(3,TablaSolicitudes);
+        esconderColumna(4,TablaSolicitudes);
+        esconderColumna(5,TablaSolicitudes);
         jRadioButton2.setSelected(true);
     }
 
@@ -54,17 +57,14 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
 
         TablaSolicitudes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Persona", "Rol Solicitado", "Persona ID", "Roles Negocio ID"
+                "Persona", "Rol Solicitado", "App solicitado", "Persona ID", "Roles Negocio ID", "App id"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, true, false, false, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -80,8 +80,18 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
 
         jRadioButton1.setText("Autorizar");
         jRadioButton1.setToolTipText("");
+        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton1ActionPerformed(evt);
+            }
+        });
 
         jRadioButton2.setText("Negar");
+        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton2ActionPerformed(evt);
+            }
+        });
 
         jButton1.setText("Confirmar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -97,19 +107,19 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jRadioButton1)
                         .addGap(18, 18, 18)
                         .addComponent(jRadioButton2)
                         .addGap(18, 18, 18)
                         .addComponent(jButton1)))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(55, Short.MAX_VALUE)
+                .addContainerGap(17, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -128,23 +138,39 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         
-        int fila = TablaSolicitudes.getSelectedRow();
-        int persona_id = Integer.parseInt(TablaSolicitudes.getValueAt(fila,2).toString());
-        int rol_id = Integer.parseInt(TablaSolicitudes.getValueAt(fila,3).toString());
-        if( jRadioButton2.isSelected()){
-            if(controlador.modificarPermiso(persona_id, rol_id,"DENEGADO")){
-             TablaSolicitudes.removeRowSelectionInterval(fila,fila);
-             
+        int[] fila = TablaSolicitudes.getSelectedRows();
+        for(int i=0;i<fila.length;i++){
+            int persona_id = Integer.parseInt(TablaSolicitudes.getValueAt(fila[i],3).toString());
+            int rol_id = Integer.parseInt(TablaSolicitudes.getValueAt(fila[i],4).toString());
+            int app_id = Integer.parseInt(TablaSolicitudes.getValueAt(fila[i],5).toString());
+            if( jRadioButton2.isSelected()){
+            if(controlador.modificarPermiso(persona_id, rol_id,app_id,"DENEGADO")){
+             TablaSolicitudes.removeRowSelectionInterval(fila[i],fila[i]);
             }
         }else{
-            if(controlador.modificarPermiso(persona_id, rol_id,"ACTIVO")){
-                TablaSolicitudes.removeRowSelectionInterval(fila,fila);
-                
+            if(controlador.modificarPermiso(persona_id, rol_id,app_id,"ACTIVO")){
+                TablaSolicitudes.removeRowSelectionInterval(fila[i],fila[i]);
             }
         }
-            
+        }
+        
+        cargarTablaSolicitudes();
               
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+        if(jRadioButton2.isSelected()){
+            jRadioButton2.setSelected(false);
+        }
+        jRadioButton1.setSelected(true);
+    }//GEN-LAST:event_jRadioButton1ActionPerformed
+
+    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
+        if(jRadioButton1.isSelected()){
+            jRadioButton1.setSelected(false);
+        }
+        jRadioButton2.setSelected(true);
+    }//GEN-LAST:event_jRadioButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -181,16 +207,20 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
         });
     }
     
-    private void cargarTabla(){
+    private void cargarTablaSolicitudes(){
         DefaultTableModel tabla = (DefaultTableModel) TablaSolicitudes.getModel();
         tabla.setRowCount(0);
-        TableColumnModel colum = TablaSolicitudes.getColumnModel();
-       /* colum.removeColumn(colum.getColumn(3));
-        colum.removeColumn(colum.getColumn(2));*/
         List<Object[]> filas = controlador.obtenerPendientes();
         for(Object[] dato:filas){
             tabla.addRow(dato);
         }
+    }
+    
+    private void esconderColumna(int indice,javax.swing.JTable tabla){
+        TableColumn columna = tabla.getColumnModel().getColumn(indice);
+        columna.setMinWidth(0);
+        columna.setMaxWidth(0);
+        columna.setPreferredWidth(0);; 
     }
     
 
@@ -206,4 +236,7 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
     public List<Object[]> obtenerPendientes() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+
+    
+    
 }

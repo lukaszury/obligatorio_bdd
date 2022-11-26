@@ -12,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -321,15 +323,23 @@ public class DB {
     public List<Object[]> obtenerPendientes(){
         List<Object[]> datos = new LinkedList<>();
         try {
+            
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
-            ResultSet rs = stm.executeQuery("SELECT personas.nombres, roles_negocio.descripcion_rol_neg,personas.user_id, roles_negocio.rol_neg_id \n" +
+            if(!existeTabla("solicitudes_view")){
+                stm.executeQuery("SELECT personas.nombres, roles_negocio.descripcion_rol_neg,"
+                                            + "aplicativos.nombreapp,personas.user_id, roles_negocio.rol_neg_id,"
+                                            + "aplicativos.app_id\n" +
                                             "FROM personas\n" +
                                             "join permisos\n" +
                                             "ON personas.user_id = permisos.user_id\n" +
+                                            "JOIN aplicativos\n" +
+                                            "ON aplicativos.app_id=permisos.app_id\n" +
                                             "join roles_negocio\n" +
                                             "ON roles_negocio.rol_neg_id = permisos.rol_neg_id\n" +
                                             "WHERE estado ='PENDIENTE';");
+            }
+            ResultSet rs = stm.executeQuery("SELECT * FROM solicitudes_view");
             ResultSetMetaData rsMetaData = rs.getMetaData();
             int columnas = rsMetaData.getColumnCount();
             while (rs.next()) {
@@ -347,15 +357,21 @@ public class DB {
         }
         return datos;
     }
-    public boolean modificarPermiso(int persona_id,int rol_id,String modificacion){
+    
+    
+    
+    public boolean modificarPermiso(int persona_id,int rol_id,int app_id,String modificacion){
         
          try {
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+             LocalDateTime horaActual = LocalDateTime.now();  
             String query = String.format("UPDATE permisos\n" +
-                                            "SET estado = '%s'\n"+
-                                            "WHERE user_id= %d AND rol_neg_id = %d ;", modificacion,persona_id,rol_id);
-            ResultSet rs=stm.executeQuery(query);
+                                            "SET estado = '%s', fecha_autorizacion= '%s' \n"+
+                                            "WHERE user_id= %d AND rol_neg_id = %d AND app_id = %d;", modificacion,
+                                            dtf.format(horaActual),persona_id,rol_id,app_id);
+            stm.executeUpdate(query);
             stm.close();
             conn.close();
             return true;
