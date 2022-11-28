@@ -50,6 +50,8 @@ public class DB {
         cargarPersonas();
         cargarPersonasPreguntas();
         cargarPermisos();
+        solicitudesView();
+        negocioAplicativo();
     }
 
     private void cargarPreguntas() {
@@ -126,7 +128,7 @@ public class DB {
                 stm.executeUpdate("CREATE TABLE  roles_aplicativos ( "
                         + "app_id int,"
                         + "rol_id int NOT NULL AUTO_INCREMENT,"
-                        + "descripcion_menu TEXT NOT NULL, "
+                        + "descripcion_rol TEXT NOT NULL, "
                         + "PRIMARY KEY(rol_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id))");
                 stm.close();
@@ -165,7 +167,6 @@ public class DB {
                         + "rol_neg_id int,"
                         + "app_id int,"
                         + "rol_id int,"
-                        + "descripcion_menu TEXT NOT NULL,"
                         + "FOREIGN KEY(rol_neg_id) REFERENCES roles_negocio(rol_neg_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id),"
                         + "FOREIGN KEY(rol_id) REFERENCES roles_aplicativos(rol_id))");
@@ -189,7 +190,7 @@ public class DB {
                         + "ciudad TEXT NOT NULL,"
                         + "departamento TEXT NOT NULL,"
                         + "hashpwd TEXT NOT NULL UNIQUE,"
-                        + "PRIMARY KEY(user_id))");
+                        + "PRIMARY KEY(user_id));");
                 stm.close();
             }
         } catch (SQLException e) {
@@ -225,15 +226,58 @@ public class DB {
                         + "app_id int,"
                         + "rol_neg_id int,"
                         + "fecha_solicitud DATE NOT NULL, "
-                        + "fecha_autorizacion DATE  "
+                        + "fecha_autorizacion DATE,"
                         + "estado TEXT NOT NULL,"
                         + "FOREIGN KEY(user_id) REFERENCES personas(user_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id),"
-                        + "FOREIGN KEY(rol_neg_id) REFERENCES roles_negocio(rol_neg_id))");
+                        + "FOREIGN KEY(rol_neg_id) REFERENCES roles_negocio(rol_neg_id));");
                 stm.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+    
+    private void solicitudesView(){
+        try{
+           
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            if(!existeTabla("solicitudes_view")){
+                stm.executeQuery("CREATE VIEW solicitudes_view AS SELECT personas.nombres, roles_negocio.descripcion_rol_neg,"
+                                            + "aplicativos.nombreapp,personas.user_id, roles_negocio.rol_neg_id,"
+                                            + "aplicativos.app_id\n" +
+                                            "FROM personas\n" +
+                                            "join permisos\n" +
+                                            "ON personas.user_id = permisos.user_id\n" +
+                                            "JOIN aplicativos\n" +
+                                            "ON aplicativos.app_id=permisos.app_id\n" +
+                                            "join roles_negocio\n" +
+                                            "ON roles_negocio.rol_neg_id = permisos.rol_neg_id\n" +
+                                            "WHERE estado ='PENDIENTE';");
+            } 
+        }catch (SQLException ex) {
+            ex.printStackTrace();     
+        }
+    }
+    
+    private void negocioAplicativo(){
+             try{
+           
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            if(!existeTabla("negocio_aplicativo")){
+                stm.executeQuery("CREATE VIEW negocio_aplicativo AS SELECT roles_negocio_aplicativos.rol_neg_id,"
+                        + " roles_aplicativos.rol_id,roles_aplicativos.descripcion_rol,aplicativos.app_id,"
+                        + "aplicativos.nombreapp\n" 
+                        +"FROM roles_negocio_aplicativos\n" 
+                        +"join roles_aplicativos\n"
+                        +"ON roles_aplicativos.rol_id = roles_negocio_aplicativos.rol_id\n"
+                        +"JOIN aplicativos\n"
+                        +"ON aplicativos.app_id=roles_aplicativos.app_id;");
+            } 
+        }catch (SQLException ex) {
+            ex.printStackTrace();     
         }
     }
 
@@ -289,7 +333,7 @@ public class DB {
     }
 
     public ArrayList<String> obtenerPreguntas() {
-        ArrayList<String> data = new ArrayList<String>();
+        ArrayList<String> data = new ArrayList<>();
         try {
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
@@ -320,25 +364,28 @@ public class DB {
         return data;
     }
     
+    public ArrayList<String> obtenerApps() {
+        ArrayList<String> data = new ArrayList<>();
+        try {
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            ResultSet rs = stm.executeQuery("SELECT * FROM aplicativos");
+            while (rs.next()) {
+                String item = rs.getString("app_id") + " - " + rs.getString("nombreApp");
+                data.add(item);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return data;
+    }
+    
     public List<Object[]> obtenerPendientes(){
         List<Object[]> datos = new LinkedList<>();
         try {
             
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
-            if(!existeTabla("solicitudes_view")){
-                stm.executeQuery("SELECT personas.nombres, roles_negocio.descripcion_rol_neg,"
-                                            + "aplicativos.nombreapp,personas.user_id, roles_negocio.rol_neg_id,"
-                                            + "aplicativos.app_id\n" +
-                                            "FROM personas\n" +
-                                            "join permisos\n" +
-                                            "ON personas.user_id = permisos.user_id\n" +
-                                            "JOIN aplicativos\n" +
-                                            "ON aplicativos.app_id=permisos.app_id\n" +
-                                            "join roles_negocio\n" +
-                                            "ON roles_negocio.rol_neg_id = permisos.rol_neg_id\n" +
-                                            "WHERE estado ='PENDIENTE';");
-            }
             ResultSet rs = stm.executeQuery("SELECT * FROM solicitudes_view");
             ResultSetMetaData rsMetaData = rs.getMetaData();
             int columnas = rsMetaData.getColumnCount();
@@ -380,10 +427,106 @@ public class DB {
         }
          return false;
     }
+    
+    public List<Object[]> obtenerPermisosRol(int rol){
+        List<Object[]> datos = new LinkedList<>();
+        try {
+            
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            String query = String.format("SELECT negocio_aplicativo.nombreapp, negocio_aplicativo.descripcion_rol,"
+                    +"negocio_aplicativo.app_id, negocio_aplicativo.rol_id, negocio_aplicativo.rol_neg_id \n" 
+                    +" FROM negocio_aplicativo \n"
+                    + "WHERE rol_neg_id = %d ",rol);
+            ResultSet rs = stm.executeQuery(query);
+            ResultSetMetaData rsMetaData = rs.getMetaData();
+            int columnas = rsMetaData.getColumnCount();
+            while (rs.next()) {
+                Object[] item = new Object[columnas];
+                for(int i =0; i < columnas; i++){
+                    item[i]=rs.getObject(i+1);
+                }
+                datos.add(item);
+           
+            }
+            stm.close();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return datos;
+        
+    }
+    
+    public List<Object[]> cargarTablaPermisosExcluidos(int rol){
+        List<Object[]> datos = new LinkedList<>();
+        try {
+            
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            String query = String.format("SELECT negocio_aplicativo.nombreapp, negocio_aplicativo.descripcion_rol,"
+                    +"negocio_aplicativo.app_id, negocio_aplicativo.rol_id \n" 
+                    +" FROM negocio_aplicativo \n"
+                    + "WHERE rol_neg_id <> %d ",rol);
+            ResultSet rs = stm.executeQuery(query);
+            ResultSetMetaData rsMetaData = rs.getMetaData();
+            int columnas = rsMetaData.getColumnCount();
+            while (rs.next()) {
+                Object[] item = new Object[columnas];
+                for(int i =0; i < columnas; i++){
+                    item[i]=rs.getObject(i+1);
+                }
+                datos.add(item);
+           
+            }
+            stm.close();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return datos;
+        
+    }
+    public boolean quitarPermisoRol(int app_id, int rol_id, int rol_negocio_id) {
+       try {
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            String query = String.format("DELETE FROM roles_negocio_aplicativos\n" +
+                                            "WHERE app_id= %d AND rol_id = %d AND rol_neg_id = %d;",
+                                            app_id,rol_id,rol_negocio_id);
+            stm.executeUpdate(query);
+            stm.close();
+            conn.close();
+            return true;
+         } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+         return false;
+    }
+    
+    public boolean agregarPermisoRol(int app_id, int rol_id, int rol_negocio_id) {
+         try {
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            String query = String.format("INSERT INTO roles_negocio_aplicativos\n" +
+                                            "values( %d,%d,%d);",
+                                            rol_negocio_id,app_id,rol_id);
+            stm.executeUpdate(query);
+            stm.close();
+            conn.close();
+            return true;
+         } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+         return false;
+    }
+    
 
     private boolean existeTabla(String nombre) throws SQLException {
         DatabaseMetaData dbm = conn.getMetaData();
         ResultSet tables = dbm.getTables(null, null, nombre, null);
         return tables.next();
     }
+
+    
 }

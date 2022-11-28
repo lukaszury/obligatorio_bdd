@@ -107,14 +107,14 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jRadioButton1)
                         .addGap(18, 18, 18)
                         .addComponent(jRadioButton2)
                         .addGap(18, 18, 18)
                         .addComponent(jButton1)))
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -139,7 +139,8 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         
         int[] fila = TablaSolicitudes.getSelectedRows();
-        for(int i=0;i<fila.length;i++){
+        if(fila!=null){
+            for(int i=0;i<fila.length;i++){
             int persona_id = Integer.parseInt(TablaSolicitudes.getValueAt(fila[i],3).toString());
             int rol_id = Integer.parseInt(TablaSolicitudes.getValueAt(fila[i],4).toString());
             int app_id = Integer.parseInt(TablaSolicitudes.getValueAt(fila[i],5).toString());
@@ -156,6 +157,8 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
         
         cargarTablaSolicitudes();
               
+        }
+        
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
@@ -197,6 +200,7 @@ public class FrmManejoSolicitud extends javax.swing.JFrame implements ManejoSoli
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(FrmManejoSolicitud.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */

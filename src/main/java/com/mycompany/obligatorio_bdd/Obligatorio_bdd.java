@@ -13,6 +13,7 @@ import java.sql.Statement;
 import model.DB;
 import view.FrmLogin;
 import view.FrmManejoSolicitud;
+import view.FrmPermisosAppsRoles;
 
 /**
  *
@@ -21,7 +22,7 @@ import view.FrmManejoSolicitud;
 public class Obligatorio_bdd {
 
     public static void main(String[] args) throws SQLException {
-        FrmManejoSolicitud frm = new FrmManejoSolicitud();
+        FrmPermisosAppsRoles frm = new FrmPermisosAppsRoles();
         frm.setVisible(true);
         DB db = new DB();
         HashHelper hh = new HashHelper();
