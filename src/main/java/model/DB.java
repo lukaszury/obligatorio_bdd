@@ -45,6 +45,46 @@ public class DB {
         cargarPersonas();
         cargarPersonasPreguntas();
         cargarPermisos();
+        crearViewAplicativosUsuario();
+        crearViewMenusAutorizadosUsuario();
+    }
+
+    private void crearViewAplicativosUsuario() {
+        try {
+            System.out.println("Creación view de aplicativos de usuario");
+            if (!existeTabla("view_aplicativos_usuario")) {
+                Statement stm = conn.createStatement();
+                stm.executeUpdate("CREATE VIEW view_aplicativos_usuario AS "
+                        + "SELECT a.app_id, a.nombreapp, p.estado, p.user_id "
+                        + "FROM permisos p "
+                        + "JOIN roles_negocio rn ON p.rol_neg_id = rn.rol_neg_id "
+                        + "JOIN roles_negocio_aplicativos rna ON rna.rol_neg_id = rn.rol_neg_id "
+                        + "JOIN roles_aplicativos ra ON ra.rol_id = rna.rol_id "
+                        + "JOIN aplicativos a ON a.app_id = rna.app_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void crearViewMenusAutorizadosUsuario() {
+        try {
+            System.out.println("Creación view de menus autorizados de usuario");
+            if (!existeTabla("view_aplicativos_usuario")) {
+                Statement stm = conn.createStatement();
+                stm.executeUpdate("CREATE VIEW view_menus_autorizados AS "
+                        + "SELECT am.descripcion_menu, am.menu_id, p.estado, p.user_id, a.nombreapp, a.app_id "
+                        + "FROM permisos p "
+                        + "JOIN roles_negocio rn ON p.rol_neg_id = rn.rol_neg_id "
+                        + "JOIN roles_negocio_aplicativos rna ON rna.rol_neg_id = rn.rol_neg_id "
+                        + "JOIN roles_aplicativos ra ON ra.rol_id = rna.rol_id "
+                        + "JOIN aplicativos a ON ra.app_id = a.app_id "
+                        + "JOIN roles_aplicativos_menu ram ON ram.rol_id = ra.rol_id "
+                        + "JOIN aplicativos_menu am ON am.menu_id = ram.menu_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void cargarPreguntas() {
@@ -306,7 +346,7 @@ public class DB {
         }
         return data;
     }
-    
+
     public ArrayList<String> obtenerRoles() {
         ArrayList<String> data = new ArrayList<String>();
         try {
