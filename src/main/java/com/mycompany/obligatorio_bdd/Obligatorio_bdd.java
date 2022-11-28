@@ -24,7 +24,7 @@ public class Obligatorio_bdd {
         frm.setVisible(true);
         DB db = new DB();
         HashHelper hh = new HashHelper();
-        System.out.println(hh.crypt("asd", "lucas"));
+        System.out.println(hh.crypt("1234", "Ignacio"));
         
 //        Connection conn = null;
 //        

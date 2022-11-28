@@ -22,8 +22,8 @@ import java.util.logging.Logger;
 public class DB {
 
     private String url = "jdbc:mariadb://localhost:3306/obligatorio";
-    private String db_user = "lukas";
-    private String db_pass = "q1w2e3r4";
+    private String db_user = "root";
+    private String db_pass = "root";
     private Connection conn = null;
     private HashHelper hashHelper = null;
 
@@ -45,6 +45,46 @@ public class DB {
         cargarPersonas();
         cargarPersonasPreguntas();
         cargarPermisos();
+        crearViewAplicativosUsuario();
+        crearViewMenusAutorizadosUsuario();
+    }
+
+    private void crearViewAplicativosUsuario() {
+        try {
+            System.out.println("Creación view de aplicativos de usuario");
+            if (!existeTabla("view_aplicativos_usuario")) {
+                Statement stm = conn.createStatement();
+                stm.executeUpdate("CREATE VIEW view_aplicativos_usuario AS "
+                        + "SELECT a.app_id, a.nombreapp, p.estado, p.user_id "
+                        + "FROM permisos p "
+                        + "JOIN roles_negocio rn ON p.rol_neg_id = rn.rol_neg_id "
+                        + "JOIN roles_negocio_aplicativos rna ON rna.rol_neg_id = rn.rol_neg_id "
+                        + "JOIN roles_aplicativos ra ON ra.rol_id = rna.rol_id "
+                        + "JOIN aplicativos a ON a.app_id = rna.app_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void crearViewMenusAutorizadosUsuario() {
+        try {
+            System.out.println("Creación view de menus autorizados de usuario");
+            if (!existeTabla("view_aplicativos_usuario")) {
+                Statement stm = conn.createStatement();
+                stm.executeUpdate("CREATE VIEW view_menus_autorizados AS "
+                        + "SELECT am.descripcion_menu, am.menu_id, p.estado, p.user_id, a.nombreapp, a.app_id "
+                        + "FROM permisos p "
+                        + "JOIN roles_negocio rn ON p.rol_neg_id = rn.rol_neg_id "
+                        + "JOIN roles_negocio_aplicativos rna ON rna.rol_neg_id = rn.rol_neg_id "
+                        + "JOIN roles_aplicativos ra ON ra.rol_id = rna.rol_id "
+                        + "JOIN aplicativos a ON ra.app_id = a.app_id "
+                        + "JOIN roles_aplicativos_menu ram ON ram.rol_id = ra.rol_id "
+                        + "JOIN aplicativos_menu am ON am.menu_id = ram.menu_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void cargarPreguntas() {
@@ -104,7 +144,7 @@ public class DB {
                         + "app_id int,"
                         + "menu_id int NOT NULL AUTO_INCREMENT,"
                         + "descripcion_menu TEXT NOT NULL, "
-                        + "PRIMARY KEY(menu_id),"
+                        + "PRIMARY KEY(menu_id, app_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id))");
                 stm.close();
             }
@@ -121,8 +161,8 @@ public class DB {
                 stm.executeUpdate("CREATE TABLE  roles_aplicativos ( "
                         + "app_id int,"
                         + "rol_id int NOT NULL AUTO_INCREMENT,"
-                        + "descripcion_menu TEXT NOT NULL, "
-                        + "PRIMARY KEY(rol_id),"
+                        + "descripcion_rol TEXT NOT NULL, "
+                        + "PRIMARY KEY(rol_id, app_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id))");
                 stm.close();
             }
@@ -139,11 +179,11 @@ public class DB {
                 stm.executeUpdate("CREATE TABLE  roles_aplicativos_menu ( "
                         + "app_id int,"
                         + "rol_id int,"
-                        + "menu_id int NOT NULL AUTO_INCREMENT,"
-                        + "descripcion_menu TEXT NOT NULL, "
-                        + "PRIMARY KEY(menu_id),"
+                        + "menu_id int,"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id),"
-                        + "FOREIGN KEY(rol_id) REFERENCES roles_aplicativos(rol_id))");
+                        + "FOREIGN KEY(rol_id) REFERENCES roles_aplicativos(rol_id),"
+                        + "FOREIGN KEY(menu_id) REFERENCES aplicativos_menu(menu_id),"
+                        + "PRIMARY KEY(app_id, rol_id, menu_id))");
                 stm.close();
             }
         } catch (SQLException e) {
@@ -160,7 +200,7 @@ public class DB {
                         + "rol_neg_id int,"
                         + "app_id int,"
                         + "rol_id int,"
-                        + "descripcion_menu TEXT NOT NULL,"
+                        + "PRIMARY KEY (rol_neg_id, app_id, rol_id),"
                         + "FOREIGN KEY(rol_neg_id) REFERENCES roles_negocio(rol_neg_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id),"
                         + "FOREIGN KEY(rol_id) REFERENCES roles_aplicativos(rol_id))");
@@ -201,6 +241,7 @@ public class DB {
                         + "user_id int NOT NULL,"
                         + "preg_id int NOT NULL,"
                         + "respuesta TEXT NOT NULL,"
+                        + "PRIMARY KEY(user_id, preg_id),"
                         + "FOREIGN KEY(user_id) REFERENCES personas(user_id),"
                         + "FOREIGN KEY(preg_id) REFERENCES preguntas(preg_id))");
                 stm.close();
@@ -215,13 +256,14 @@ public class DB {
             System.out.println("Permisos");
             if (!existeTabla("permisos")) {
                 Statement stm = conn.createStatement();
-                stm.executeUpdate("CREATE TABLE  permisos ( "
+                stm.executeUpdate("CREATE TABLE  permisos ("
                         + "user_id int,"
                         + "app_id int,"
                         + "rol_neg_id int,"
-                        + "fecha_solicitud DATE NOT NULL, "
-                        + "fecha_autorizacion DATE NOT NULL, "
+                        + "fecha_solicitud DATE NOT NULL,"
+                        + "fecha_autorizacion DATE,"
                         + "estado TEXT NOT NULL,"
+                        + "PRIMARY KEY(user_id, app_id, rol_neg_id),"
                         + "FOREIGN KEY(user_id) REFERENCES personas(user_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id),"
                         + "FOREIGN KEY(rol_neg_id) REFERENCES roles_negocio(rol_neg_id))");
@@ -232,18 +274,24 @@ public class DB {
         }
     }
 
-    public boolean verificarUsuario(String user, String pass) {
+    public boolean verificarUsuario(String user, String pass, UserSession userSession) {
         String hashpwd = hashHelper.crypt(pass, user);
         try {
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
-            String query = String.format("SELECT (count(*) > 0) AS usuario FROM personas WHERE (nombres = '%s' AND hashpwd = '%s')", user, hashpwd);
+            String query = String.format("SELECT * FROM personas WHERE (nombres = '%s' AND hashpwd = '%s')", user, hashpwd);
             ResultSet rs = stm.executeQuery(query);
             if (rs.next()) {
                 boolean encontrado = rs.getBoolean(1);
                 stm.close();
                 conn.close();
                 if (encontrado) {
+                    userSession.setUser_id(rs.getInt(1));
+                    userSession.setNombres(rs.getString(2));
+                    userSession.setApellidos(rs.getString(3));
+                    userSession.setDireccion(rs.getString(4));
+                    userSession.setCiudad(rs.getString(5));
+                    userSession.setApartamento(rs.getString(6));
                     return true;
                 } else {
                     return false;
@@ -298,7 +346,7 @@ public class DB {
         }
         return data;
     }
-    
+
     public ArrayList<String> obtenerRoles() {
         ArrayList<String> data = new ArrayList<String>();
         try {
@@ -319,5 +367,14 @@ public class DB {
         DatabaseMetaData dbm = conn.getMetaData();
         ResultSet tables = dbm.getTables(null, null, nombre, null);
         return tables.next();
+    }
+
+    public Connection getConnection() {
+        try {
+            return DriverManager.getConnection(url, db_user, db_pass);
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 }

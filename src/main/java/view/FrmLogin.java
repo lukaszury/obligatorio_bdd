@@ -10,12 +10,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import model.LoginInterface;
+import model.UserSession;
 
 /**
  *
  * @author lukas
  */
-public class FrmLogin extends javax.swing.JFrame implements LoginInterface{
+public class FrmLogin extends javax.swing.JFrame implements LoginInterface {
+
     LoginController controller;
 
     /**
@@ -23,6 +25,7 @@ public class FrmLogin extends javax.swing.JFrame implements LoginInterface{
      */
     public FrmLogin() {
         initComponents();
+        this.setLocationRelativeTo(null);
         controller = new LoginController(this);
     }
 
@@ -87,7 +90,14 @@ public class FrmLogin extends javax.swing.JFrame implements LoginInterface{
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
         try {
-            controller.ingresar();
+            UserSession userSession = new UserSession();
+            if (controller.ingresar(userSession)) {
+                this.setVisible(false);
+                FrmAplicativos formAplicativos = new FrmAplicativos(userSession);
+                formAplicativos.setVisible(true);
+            } else {
+                this.mostrarMsg("Login error");
+            }
         } catch (SQLException ex) {
             Logger.getLogger(FrmLogin.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -148,6 +158,6 @@ public class FrmLogin extends javax.swing.JFrame implements LoginInterface{
 
     @Override
     public void mostrarMsg(String msg) {
-        JOptionPane.showMessageDialog(null,msg);
+        JOptionPane.showMessageDialog(null, msg);
     }
 }

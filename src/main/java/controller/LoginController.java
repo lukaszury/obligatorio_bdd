@@ -7,6 +7,8 @@ package controller;
 import java.sql.SQLException;
 import model.DB;
 import model.LoginInterface;
+import model.UserSession;
+import view.FrmAplicativos;
 
 /**
  *
@@ -21,16 +23,12 @@ public class LoginController {
         this.ui = ui;
     }
     
-    public void ingresar() throws SQLException
+    public boolean ingresar(UserSession userSession) throws SQLException
     {
         db = new DB();
         String user = ui.getUser();
         String pass = ui.getPass();
-        if(db.verificarUsuario(user, pass)){
-            ui.mostrarMsg("Ingreso");
-        } else {
-            ui.mostrarMsg("No ingreso :(");
-        }
+        return db.verificarUsuario(user, pass, userSession);
     }
     
 }
