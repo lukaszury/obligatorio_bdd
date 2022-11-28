@@ -35,8 +35,8 @@ public class PermisosRolesAppsControlador {
     public List<Object[]> obtenerPermisosRol(int i){
         return db.obtenerPermisosRol(i);
     }
-    public List<Object[]> cargarTablaPermisosExcluidos(int i){
-        return db.cargarTablaPermisosExcluidos(i);
+    public List<Object[]> cargarTablaPermisosApps(){
+        return db.cargarTablaPermisosApps();
     }
     public boolean quitarPermisoRol(int app_id,int rol_id,int rol_negocio_id){
         return db.quitarPermisoRol(app_id,rol_id,rol_negocio_id);

@@ -52,8 +52,9 @@ public class DB {
         cargarPermisos();
         solicitudesView();
         negocioAplicativo();
+        AppsRolesView();
     }
-
+    // se generan todas las tablas y views en caso de que no existieran en la base
     private void cargarPreguntas() {
         try {
             System.out.println("Preguntas");
@@ -167,6 +168,7 @@ public class DB {
                         + "rol_neg_id int,"
                         + "app_id int,"
                         + "rol_id int,"
+                        + "PRIMARY KEY(rol_neg_id,app_id,rol_id),"
                         + "FOREIGN KEY(rol_neg_id) REFERENCES roles_negocio(rol_neg_id),"
                         + "FOREIGN KEY(app_id) REFERENCES aplicativos(app_id),"
                         + "FOREIGN KEY(rol_id) REFERENCES roles_aplicativos(rol_id))");
@@ -261,6 +263,24 @@ public class DB {
         }
     }
     
+    private void AppsRolesView(){
+        try{
+           
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            if(!existeTabla("apps_roles")){
+                stm.executeQuery("CREATE VIEW apps_roles AS \n" +
+                                 "SELECT aplicativos.nombreapp,roles_aplicativos.descripcion_rol,"+
+                                 "aplicativos.app_id,roles_aplicativos.rol_id\n" +
+                                 "FROM roles_aplicativos\n" +
+                                 "JOIN aplicativos\n" +
+                                 "ON roles_aplicativos.app_id=aplicativos.app_id;");
+            } 
+        }catch (SQLException ex) {
+            ex.printStackTrace();     
+        }
+    }
+    
     private void negocioAplicativo(){
              try{
            
@@ -272,7 +292,8 @@ public class DB {
                         + "aplicativos.nombreapp\n" 
                         +"FROM roles_negocio_aplicativos\n" 
                         +"join roles_aplicativos\n"
-                        +"ON roles_aplicativos.rol_id = roles_negocio_aplicativos.rol_id\n"
+                        +"ON roles_aplicativos.rol_id = roles_negocio_aplicativos.rol_id "
+                        +"AND roles_aplicativos.app_id =roles_negocio_aplicativos.app_id\n"
                         +"JOIN aplicativos\n"
                         +"ON aplicativos.app_id=roles_aplicativos.app_id;");
             } 
@@ -406,12 +427,13 @@ public class DB {
     }
     
     
-    
+    //metodo para  modificar permiso con par persona,app recibido, modificacion siendo si es aprobado o no
     public boolean modificarPermiso(int persona_id,int rol_id,int app_id,String modificacion){
         
          try {
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
+            //se registra la hora actual
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
              LocalDateTime horaActual = LocalDateTime.now();  
             String query = String.format("UPDATE permisos\n" +
@@ -427,7 +449,8 @@ public class DB {
         }
          return false;
     }
-    
+    // del view negocio_aplicativo se obtienen los datos a mostrar en el form manejo solicitud
+    // se obtienen todos los permisos para el rol deseado
     public List<Object[]> obtenerPermisosRol(int rol){
         List<Object[]> datos = new LinkedList<>();
         try {
@@ -457,17 +480,14 @@ public class DB {
         return datos;
         
     }
-    
-    public List<Object[]> cargarTablaPermisosExcluidos(int rol){
+    //se obtienen todos los permisos existentes de cada rol para cada aplicativo
+    public List<Object[]> cargarTablaPermisosApps(){
         List<Object[]> datos = new LinkedList<>();
         try {
             
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
-            String query = String.format("SELECT negocio_aplicativo.nombreapp, negocio_aplicativo.descripcion_rol,"
-                    +"negocio_aplicativo.app_id, negocio_aplicativo.rol_id \n" 
-                    +" FROM negocio_aplicativo \n"
-                    + "WHERE rol_neg_id <> %d ",rol);
+            String query = String.format("SELECT * FROM apps_roles");
             ResultSet rs = stm.executeQuery(query);
             ResultSetMetaData rsMetaData = rs.getMetaData();
             int columnas = rsMetaData.getColumnCount();
@@ -487,6 +507,7 @@ public class DB {
         return datos;
         
     }
+    //se remueve elregistro del permiso con los valores pasados por parametro de la tabla roles_negocio_aplicativo
     public boolean quitarPermisoRol(int app_id, int rol_id, int rol_negocio_id) {
        try {
             conn = DriverManager.getConnection(url, db_user, db_pass);
@@ -503,7 +524,7 @@ public class DB {
         }
          return false;
     }
-    
+    //se remueve elregistro del permiso con los valores pasados por parametro de la tabla roles_negocio_aplicativo
     public boolean agregarPermisoRol(int app_id, int rol_id, int rol_negocio_id) {
          try {
             conn = DriverManager.getConnection(url, db_user, db_pass);
