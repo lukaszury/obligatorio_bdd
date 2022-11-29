@@ -26,7 +26,11 @@ public class FrmLogin extends javax.swing.JFrame implements LoginInterface {
     public FrmLogin() {
         initComponents();
         this.setLocationRelativeTo(null);
-        controller = new LoginController(this);
+        try {
+            controller = new LoginController(this);
+        } catch (SQLException ex) {
+            Logger.getLogger(FrmLogin.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

@@ -18,14 +18,14 @@ public class LoginController {
     private LoginInterface ui;
     private DB db;
     
-    public LoginController(LoginInterface ui)
+    public LoginController(LoginInterface ui) throws SQLException
     {
         this.ui = ui;
+        this.db = new DB();
     }
     
     public boolean ingresar(UserSession userSession) throws SQLException
     {
-        db = new DB();
         String user = ui.getUser();
         String pass = ui.getPass();
         return db.verificarUsuario(user, pass, userSession);
