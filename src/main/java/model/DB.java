@@ -4,9 +4,11 @@
  */
 package model;
 
+import helper.DateHelper;
 import helper.HashHelper;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -31,12 +33,14 @@ public class DB {
     private String db_pass = "root";
     private Connection conn = null;
     private HashHelper hashHelper = null;
+    private DateHelper dateHelper = null;
 
     public DB() throws SQLException {
         conn = DriverManager.getConnection(url, db_user, db_pass);
         cargarDatos();
         conn.close();
         hashHelper = new HashHelper();
+        dateHelper = new DateHelper();
     }
 
     private void cargarDatos() {
@@ -393,6 +397,10 @@ public class DB {
             System.out.println(pregunta);
             query = String.format("INSERT INTO personas_preguntas (user_id, preg_id, respuesta) VALUES (%d, %d, '%s')", id, pregunta, hashres);
             stm.executeUpdate(query);
+            Date date = dateHelper.dateFormatter();
+            query = String.format("INSERT INTO permisos (user_id, app_id, rol_neg_id ,fecha_solicitud, fecha_autorizacion, estado) VALUES (%d, 1, %d,'%s', NULL, 'PENDIENTE')", id, rol,date);
+            stm.executeUpdate(query);
+            
             stm.close();
             conn.close();
             completado = true;
