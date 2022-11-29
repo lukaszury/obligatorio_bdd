@@ -17,6 +17,7 @@ import view.FrmAplicativos;
 public class LoginController {
     private LoginInterface ui;
     private DB db;
+    public boolean isSuper;
     
     public LoginController(LoginInterface ui) throws SQLException
     {
@@ -29,6 +30,11 @@ public class LoginController {
         String user = ui.getUser();
         String pass = ui.getPass();
         return db.verificarUsuario(user, pass, userSession);
+    }
+    
+    public boolean isSuper(UserSession userSession)
+    {
+        return db.isUserAllowed(userSession.getUser_id());
     }
     
 }

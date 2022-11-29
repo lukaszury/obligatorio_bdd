@@ -31,7 +31,7 @@ public class RegistrarController {
         String direccion = ui.getDireccion();
         String ciudad = ui.getCiudad();
         String departamento = ui.getDepartamento();
-        int rol = 1;
+        int rol = ui.getApp();
         int pregunta = ui.getPregunta();
         String respuesta = ui.getRespuesta();
         if(db.registrarUsuario(nombre, apellido, direccion, ciudad, departamento, pass, rol, pregunta, respuesta)){
@@ -51,5 +51,11 @@ public class RegistrarController {
     {
         ArrayList<String> roles = db.obtenerRoles();
         return roles;
+    }
+    
+    public ArrayList<String> obtenerApps()
+    {
+        ArrayList<String> apps = db.obtenerApps();
+        return apps;
     }
 }

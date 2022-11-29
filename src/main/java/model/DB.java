@@ -4,9 +4,11 @@
  */
 package model;
 
+import helper.DateHelper;
 import helper.HashHelper;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -31,12 +33,15 @@ public class DB {
     private String db_pass = "root";
     private Connection conn = null;
     private HashHelper hashHelper = null;
+    private DateHelper dateHelper = null;
 
     public DB() throws SQLException {
         conn = DriverManager.getConnection(url, db_user, db_pass);
         cargarDatos();
+        initializeData();
         conn.close();
         hashHelper = new HashHelper();
+        dateHelper = new DateHelper();
     }
 
     private void cargarDatos() {
@@ -379,7 +384,8 @@ public class DB {
         try {
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
-            hashpwd = hashHelper.crypt(hashpwd, nombre);
+            String salt = nombre+apellido;
+            hashpwd = hashHelper.crypt(hashpwd, salt);
             String query = String.format("INSERT INTO personas (nombres, apellidos, direccion, ciudad, departamento, hashpwd) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')", nombre, apellido, direccion, ciudad, departamento, hashpwd);
             stm.executeUpdate(query);
             query = String.format("SELECT user_id FROM personas WHERE hashpwd = '%s'", hashpwd);
@@ -388,11 +394,14 @@ public class DB {
                 id = Integer.parseInt(rs.getString(1));
                 System.out.println(id);
             }
-            String salt = nombre+apellido;
             String hashres = hashHelper.crypt(respuesta, salt);
             System.out.println(pregunta);
             query = String.format("INSERT INTO personas_preguntas (user_id, preg_id, respuesta) VALUES (%d, %d, '%s')", id, pregunta, hashres);
             stm.executeUpdate(query);
+            Date date = dateHelper.dateFormatter();
+            query = String.format("INSERT INTO permisos (user_id, app_id, rol_neg_id ,fecha_solicitud, fecha_autorizacion, estado) VALUES (%d, 1, %d,'%s', NULL, 'PENDIENTE')", id, rol,date);
+            stm.executeUpdate(query);
+            
             stm.close();
             conn.close();
             completado = true;
@@ -455,6 +464,25 @@ public class DB {
             Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
         }
         return changed;
+    }
+    
+    public boolean isUserAllowed(int user_id)
+    {
+        boolean encontrado = false;
+        try {
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            String query = String.format("SELECT p1.user_id FROM permisos p1 JOIN roles_negocio rn ON p1.rol_neg_id = rn.rol_neg_id WHERE p1.estado = 'ACTIVO' AND rn.descripcion_rol_neg = 'Administrador' AND p1.user_id = %d GROUP BY p1.user_id" , user_id);
+            ResultSet rs = stm.executeQuery(query);
+            if (rs.next()) {
+                encontrado = rs.getBoolean(1);
+                stm.close();
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return encontrado;
     }
 
     public ArrayList<String> obtenerRoles() {
@@ -628,6 +656,49 @@ public class DB {
             Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
         }
          return false;
+    }
+    
+    private void initializeData()
+    {
+        try {
+            if(existeTabla("permisos")){
+            return;
+        }
+            Statement stm = conn.createStatement();
+            stm.executeUpdate("INSERT INTO personas (user_id, nombres, apellidos, direccion, ciudad, departamento, hashpwd) "
+                    + "VALUES (1, 'Juan', 'Alvez', 'Av. Italia 2291', 'Montevideo', 'Montevideo', 'a0ad0f9a9236e560b06eeb73733642505946277a2d536085b223e1b910758de8d031c46bb1334ddd289e3a58577e6a568b47d9744ba182b19c11ad7aa4fa67fc' )");
+            stm.executeUpdate("INSERT INTO personas (user_id, nombres, apellidos, direccion, ciudad, departamento, hashpwd) "
+                    + "VALUES (2, 'Luis', 'Lopez', 'Morquio 876', 'Salto', 'Salto', '0655a31ef5a7694557afdd15f6d2acc4f3b4af5981ce7b92f54ea9c8b5d7da6302f0816b69c38999be40b62fe78bbf6c9fa03c78c93602a68615a5a6d06b9e8d' )");
+            stm.executeUpdate("INSERT INTO personas (user_id, nombres, apellidos, direccion, ciudad, departamento, hashpwd) "
+                    + "VALUES (3, 'Rodrigo', 'Hernandez', 'Obligado 795', 'Montevideo', 'Montevideo', '7aeb22a7a7d63cc5b619b99633775201ebff42b38dd6acc3d4c1bfa1710dbf3c514f38e25861f153d3fe8fc85a51a49ad11102ef44d59e9dc2176e1665518544' )");
+            stm.executeUpdate("INSERT INTO preguntas (preg_id, pregunta) VALUES (1,'Como era el nombre su primer mascota?')");
+            stm.executeUpdate("INSERT INTO preguntas (preg_id, pregunta) VALUES (2,'De que cuadro deportivo es fanatico?')");
+            stm.executeUpdate("INSERT INTO preguntas (preg_id, pregunta) VALUES (3,'Cual es su comida favorita?')");
+            stm.executeUpdate("INSERT INTO roles_negocio (rol_neg_id, descipcion_rol_neg) VALUES (1,'Administrador')");
+            stm.executeUpdate("INSERT INTO roles_negocio (rol_neg_id, descipcion_rol_neg) VALUES (2,'Cajero')");
+            stm.executeUpdate("INSERT INTO roles_negocio (rol_neg_id, descipcion_rol_neg) VALUES (3,'Mesero')");
+            stm.executeUpdate("INSERT INTO aplicativos (app_id, nombreapp) VALUES (1,'Restaurante')");
+            stm.executeUpdate("INSERT INTO aplicativos (app_id, nombreapp) VALUES (1,'Supermercado')");
+            stm.executeUpdate("INSERT INTO roles_aplicativos (app_id, rol_id, descripcion_rol) VALUES (1, 1,'Administrador de restaurante')");
+            stm.executeUpdate("INSERT INTO roles_aplicativos (app_id, rol_id, descripcion_rol) VALUES (2, 2,'Cajero de supermercado')");
+            stm.executeUpdate("INSERT INTO roles_aplicativos (app_id, rol_id, descripcion_rol) VALUES (1, 3,'Mesero de Restaurante')");
+            stm.executeUpdate("INSERT INTO roles_aplicativos_menu (app_id, rol_id, descripcion_rol) VALUES (1, 1, 1)");
+            stm.executeUpdate("INSERT INTO roles_aplicativos_menu (app_id, rol_id, descripcion_rol) VALUES (1, 1, 2)");
+            stm.executeUpdate("INSERT INTO roles_aplicativos_menu (app_id, rol_id, descripcion_rol) VALUES (1, 3, 3)");
+            stm.executeUpdate("INSERT INTO roles_negocio_aplicativos (rol_neg_id ,app_id, rol_id) VALUES (1, 1, 1)");
+            stm.executeUpdate("INSERT INTO roles_negocio_aplicativos (rol_neg_id ,app_id, rol_id) VALUES (3, 1, 1)");
+            stm.executeUpdate("INSERT INTO aplicativos_menu (app_id, menu_id, descripcion_menu) VALUES (1, 1,'Menu Restaurante')");
+            stm.executeUpdate("INSERT INTO aplicativos_menu (app_id, menu_id, descripcion_menu) VALUES (2, 2,'Menu Supermercado')");
+            stm.executeUpdate("INSERT INTO personas_preguntas (user_id, preg_id, respuesta) VALUES (1, 2, 'f674cbbaa5c791274b12672c93b7c32a34abebb1f2c7d537b090a6949e70a997e3f2f89a47e18c1c8694713760b8d816931562076f70d763bb46b6d1603e8ebc')");
+            stm.executeUpdate("INSERT INTO personas_preguntas (user_id, preg_id, respuesta) VALUES (2, 1, '50c949c213e7a7884a56a82c93157505fec638a3d486df0046a6c2b671c4ac8d029959e9a0d25b1afc1334be570f503311b1ccb61b99d0e946a065e3947b2a72')");
+            stm.executeUpdate("INSERT INTO personas_preguntas (user_id, preg_id, respuesta) VALUES (3, 3, '59454d59e2715bd812111177857d6eb0f8978c68f3c6b47a9e2d6392735b5e3988faa09dbecf3f81cc6d5d8c9687cd1de57aa27c889b18b860c205073756d2d5')");
+            stm.executeUpdate("INSERT INTO permisos (user_id, app_id, rol_neg_id, fecha_solicitud, fecha_autorizacion, estado) VALUES (1, 1, 1, '2022-11-29', '2022-11-29', 'ACTIVO')");
+            stm.executeUpdate("INSERT INTO permisos (user_id, app_id, rol_neg_id, fecha_solicitud, fecha_autorizacion, estado) VALUES (2, 2, 2, '2022-11-29', '2022-11-29', 'PENDIENTE')");
+            stm.executeUpdate("INSERT INTO permisos (user_id, app_id, rol_neg_id, fecha_solicitud, fecha_autorizacion, estado) VALUES (3, 1, 1, '2022-11-29', '2022-11-29', 'PENDIENTE')");
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
     
 
