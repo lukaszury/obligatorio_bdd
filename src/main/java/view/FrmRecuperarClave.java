@@ -26,9 +26,7 @@ public class FrmRecuperarClave extends javax.swing.JFrame implements RecuperarIn
      */
     public FrmRecuperarClave() {
         initComponents();
-        lblPregunta.setVisible(false);
-        txtRespuesta.setVisible(false);
-        btnResponder.setVisible(false);
+        hideRecover();
         try {
             controller = new RecuperarController(this);
         } catch (SQLException ex) {
@@ -53,6 +51,8 @@ public class FrmRecuperarClave extends javax.swing.JFrame implements RecuperarIn
         txtRespuesta = new javax.swing.JTextField();
         btnResponder = new javax.swing.JButton();
         lblPregunta = new javax.swing.JLabel();
+        lblNuevaClave = new javax.swing.JLabel();
+        txtNuevaClave = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -68,8 +68,15 @@ public class FrmRecuperarClave extends javax.swing.JFrame implements RecuperarIn
         });
 
         btnResponder.setText("Responder");
+        btnResponder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResponderActionPerformed(evt);
+            }
+        });
 
         lblPregunta.setText("Pregunta");
+
+        lblNuevaClave.setText("Nueva clave");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -88,15 +95,23 @@ public class FrmRecuperarClave extends javax.swing.JFrame implements RecuperarIn
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
                             .addComponent(txtApellido)
-                            .addComponent(txtNombre)
-                            .addComponent(txtRespuesta)))
+                            .addComponent(txtNombre))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(41, 41, 41)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(155, 155, 155)
-                        .addComponent(btnResponder))
+                        .addComponent(btnResponder)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(172, 172, 172)
-                        .addComponent(lblPregunta)))
-                .addContainerGap(129, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblPregunta)
+                            .addComponent(txtRespuesta, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 86, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblNuevaClave)
+                            .addComponent(txtNuevaClave, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(47, 47, 47))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -111,13 +126,17 @@ public class FrmRecuperarClave extends javax.swing.JFrame implements RecuperarIn
                 .addComponent(txtApellido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(47, 47, 47)
                 .addComponent(jButton1)
-                .addGap(94, 94, 94)
-                .addComponent(lblPregunta)
-                .addGap(48, 48, 48)
-                .addComponent(txtRespuesta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(70, 70, 70)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblPregunta)
+                    .addComponent(lblNuevaClave))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtNuevaClave, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtRespuesta))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 83, Short.MAX_VALUE)
                 .addComponent(btnResponder)
-                .addContainerGap(28, Short.MAX_VALUE))
+                .addGap(51, 51, 51))
         );
 
         pack();
@@ -126,6 +145,10 @@ public class FrmRecuperarClave extends javax.swing.JFrame implements RecuperarIn
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         controller.getPregunta();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnResponderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResponderActionPerformed
+        controller.changePassword();
+    }//GEN-LAST:event_btnResponderActionPerformed
 
     /**
      * @param args the command line arguments
@@ -167,32 +190,61 @@ public class FrmRecuperarClave extends javax.swing.JFrame implements RecuperarIn
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel lblNuevaClave;
     private javax.swing.JLabel lblPregunta;
     private javax.swing.JTextField txtApellido;
     private javax.swing.JTextField txtNombre;
+    private javax.swing.JTextField txtNuevaClave;
     private javax.swing.JTextField txtRespuesta;
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public String getUser() {
+    public String getUser()
+    {
         return txtNombre.getText();
     }
 
     @Override
-    public String getPass() {
+    public String getPass()
+    {
         return txtApellido.getText();
     }
 
     @Override
-    public void showMsg(String msg) {
+    public void showMsg(String msg)
+    {
         JOptionPane.showMessageDialog(null, msg);
     }
 
     @Override
-    public void showPregunta(String pregunta) {
+    public void showPregunta(String pregunta)
+    {
         lblPregunta.setVisible(true);
         lblPregunta.setText(pregunta);
         txtRespuesta.setVisible(true);
         btnResponder.setVisible(true);
+        lblNuevaClave.setVisible(true);
+        txtNuevaClave.setVisible(true);
+    }
+    
+    private void hideRecover()
+    {
+        lblPregunta.setVisible(false);
+        txtRespuesta.setVisible(false);
+        btnResponder.setVisible(false);
+        lblNuevaClave.setVisible(false);
+        txtNuevaClave.setVisible(false);
+    }
+
+    @Override
+    public String getResponse()
+    {
+        return txtRespuesta.getText();
+    }
+
+    @Override
+    public String getNewPass()
+    {
+        return txtNuevaClave.getText();
     }
 }

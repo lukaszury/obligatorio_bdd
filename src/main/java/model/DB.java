@@ -366,9 +366,24 @@ public class DB {
         return data;
     }
     
-    /*public boolean changePassword(){
-        
-    }*/
+    public boolean changePassword(String response,String name,String newPass){
+        boolean changed = false;
+        String hashres = hashHelper.crypt(response, name);
+        String hashpass = hashHelper.crypt(newPass, name);
+        System.out.println(hashres);
+        try {
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            String query = String.format("UPDATE personas p JOIN personas_preguntas pp ON p.user_id = pp.user_id SET p.hashpwd = '%s' WHERE pp.respuesta = '%s'" , hashpass,hashres);
+            int rowsAffected = stm.executeUpdate(query);
+            if(rowsAffected>0) {
+                changed = true;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return changed;
+    }
 
     public ArrayList<String> obtenerRoles() {
         ArrayList<String> data = new ArrayList<String>();

@@ -11,6 +11,8 @@ package model;
 public interface RecuperarInterface {
     String getUser();
     String getPass();
+    String getResponse();
+    String getNewPass();
     void showPregunta(String pregunta);
     void showMsg(String msg);
 }

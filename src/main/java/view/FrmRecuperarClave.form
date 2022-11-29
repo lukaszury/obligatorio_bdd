@@ -39,19 +39,31 @@
                           <Component id="jButton1" alignment="0" pref="156" max="32767" attributes="0"/>
                           <Component id="txtApellido" max="32767" attributes="0"/>
                           <Component id="txtNombre" max="32767" attributes="0"/>
-                          <Component id="txtRespuesta" alignment="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" pref="155" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
                       <Component id="btnResponder" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" pref="172" max="-2" attributes="0"/>
-                      <Component id="lblPregunta" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="lblPregunta" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtRespuesta" alignment="0" min="-2" pref="111" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="86" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="lblNuevaClave" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtNuevaClave" min="-2" pref="115" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace pref="129" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -68,13 +80,19 @@
               <Component id="txtApellido" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
               <Component id="jButton1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="94" max="-2" attributes="0"/>
-              <Component id="lblPregunta" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="48" max="-2" attributes="0"/>
-              <Component id="txtRespuesta" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="70" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lblPregunta" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblNuevaClave" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="txtNuevaClave" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
+                  <Component id="txtRespuesta" alignment="3" max="32767" attributes="0"/>
+              </Group>
+              <EmptySpace pref="83" max="32767" attributes="0"/>
               <Component id="btnResponder" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="28" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -108,11 +126,21 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Responder"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnResponderActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblPregunta">
       <Properties>
         <Property name="text" type="java.lang.String" value="Pregunta"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblNuevaClave">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Nueva clave"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtNuevaClave">
     </Component>
   </SubComponents>
 </Form>
