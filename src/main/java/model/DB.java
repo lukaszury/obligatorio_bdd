@@ -80,7 +80,7 @@ public class DB {
                         + "JOIN roles_aplicativos ra ON ra.rol_id = rna.rol_id "
                         + "JOIN aplicativos a ON ra.app_id = a.app_id "
                         + "JOIN roles_aplicativos_menu ram ON ram.rol_id = ra.rol_id "
-                        + "JOIN aplicativos_menu am ON am.menu_id = ram.menu_id");
+                        + "JOIN aplicativos_menu am ON ram.menu_id = am.menu_id");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -305,7 +305,7 @@ public class DB {
 
     public boolean registrarUsuario(String nombre, String apellido, String direccion, String ciudad, String departamento, String hashpwd, int rol, int pregunta, String respuesta) {
         int id = -1;
-        boolean compleado = false;
+        boolean completado = false;
         try {
             conn = DriverManager.getConnection(url, db_user, db_pass);
             Statement stm = conn.createStatement();
@@ -324,11 +324,30 @@ public class DB {
             stm.executeUpdate(query);
             stm.close();
             conn.close();
-            compleado = true;
+            completado = true;
         } catch (SQLException ex) {
             Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return compleado;
+        return completado;
+    }
+    
+    public String getPreguntaUsuario(String nombre, String apellido){
+        String pregunta = "";
+        try {
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            String query = String.format("SELECT pregunta FROM personas p JOIN personas_preguntas pp ON p.user_id = pp.user_id JOIN preguntas pr ON pp.preg_id = pr.preg_id WHERE p.nombres = '%s' AND p.apellidos = '%s';", nombre, apellido);
+            ResultSet rs = stm.executeQuery(query);
+            while (rs.next()) {
+                pregunta = rs.getString(1);
+                System.out.println(pregunta);
+            }
+            stm.close();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return pregunta;
     }
 
     public ArrayList<String> obtenerPreguntas() {
@@ -346,6 +365,10 @@ public class DB {
         }
         return data;
     }
+    
+    /*public boolean changePassword(){
+        
+    }*/
 
     public ArrayList<String> obtenerRoles() {
         ArrayList<String> data = new ArrayList<String>();
