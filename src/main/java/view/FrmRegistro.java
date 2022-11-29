@@ -33,6 +33,7 @@ public class FrmRegistro extends javax.swing.JFrame implements RegistrarInterfac
         }
         cargarRoles();
         cargarPreguntas();
+        cargarApp();
     }
 
     /**
@@ -62,7 +63,8 @@ public class FrmRegistro extends javax.swing.JFrame implements RegistrarInterfac
         jLabel8 = new javax.swing.JLabel();
         jcbPregunta = new javax.swing.JComboBox<>();
         txtPregunta = new javax.swing.JTextField();
-        btntest = new javax.swing.JButton();
+        jcbApps = new javax.swing.JComboBox<>();
+        jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -89,12 +91,7 @@ public class FrmRegistro extends javax.swing.JFrame implements RegistrarInterfac
 
         jLabel8.setText("Seleccione una pregunta");
 
-        btntest.setText("test");
-        btntest.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btntestActionPerformed(evt);
-            }
-        });
+        jLabel9.setText("Aplicativos");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -103,6 +100,12 @@ public class FrmRegistro extends javax.swing.JFrame implements RegistrarInterfac
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(btnRegistrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jcbPregunta, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
@@ -125,17 +128,12 @@ public class FrmRegistro extends javax.swing.JFrame implements RegistrarInterfac
                                 .addComponent(txtDepartamento)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jcbApps, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel7)
                             .addComponent(jLabel8)
                             .addComponent(txtPregunta)
                             .addComponent(jcbRoles, 0, 270, Short.MAX_VALUE)
-                            .addComponent(btntest)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(btnRegistrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jcbPregunta, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jLabel9))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -149,17 +147,22 @@ public class FrmRegistro extends javax.swing.JFrame implements RegistrarInterfac
                         .addComponent(jLabel7)))
                 .addGap(3, 3, 3)
                 .addComponent(jcbRoles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(4, 4, 4)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(txtApellido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel9)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jcbApps, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(4, 4, 4)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(txtApellido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(40, 40, 40)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel6)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtClave, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btntest)))
-                .addGap(36, 36, 36)
+                    .addComponent(txtClave, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(37, 37, 37)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -191,10 +194,6 @@ public class FrmRegistro extends javax.swing.JFrame implements RegistrarInterfac
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
         rc.registrar();
     }//GEN-LAST:event_btnRegistrarActionPerformed
-
-    private void btntestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btntestActionPerformed
-        
-    }//GEN-LAST:event_btntestActionPerformed
 
     /**
      * @param args the command line arguments
@@ -233,7 +232,6 @@ public class FrmRegistro extends javax.swing.JFrame implements RegistrarInterfac
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRegistrar;
-    private javax.swing.JButton btntest;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -242,6 +240,8 @@ public class FrmRegistro extends javax.swing.JFrame implements RegistrarInterfac
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JComboBox<String> jcbApps;
     private javax.swing.JComboBox<String> jcbPregunta;
     private javax.swing.JComboBox<String> jcbRoles;
     private javax.swing.JTextField txtApellido;
@@ -289,9 +289,17 @@ public class FrmRegistro extends javax.swing.JFrame implements RegistrarInterfac
     }
 
     @Override
-    public int getPregunta() {
+    public int getPregunta() 
+    {
         String pregunta = (String) jcbPregunta.getSelectedItem();
         return Character.getNumericValue(pregunta.charAt(0));
+    }
+    
+    @Override
+    public int getApp()
+    {
+        String app = (String) jcbApps.getSelectedItem();
+        return Character.getNumericValue(app.charAt(0));
     }
       
     public void cargarPreguntas()
@@ -304,6 +312,12 @@ public class FrmRegistro extends javax.swing.JFrame implements RegistrarInterfac
     {
         List<String> ls = rc.obtenerRoles();
         jcbRoles.setModel(new DefaultComboBoxModel<String>(ls.toArray(new String[0])));
+    }
+    
+    private void cargarApp()
+    {
+        List<String> ls = rc.obtenerApps();
+        jcbApps.setModel(new DefaultComboBoxModel<String>(ls.toArray(new String[0])));
     }
 
     @Override

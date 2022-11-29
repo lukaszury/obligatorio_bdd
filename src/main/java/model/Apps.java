@@ -34,7 +34,7 @@ public class Apps {
         try {
             Connection conn = db.getConnection();
             Statement stm = conn.createStatement();
-            String query = String.format("SELECT * FROM view_aplicativos_usuario WHERE estado = 'APROBADO' AND user_id = '%s'", user_id);
+            String query = String.format("SELECT * FROM view_aplicativos_usuario WHERE estado = 'ACTIVO' AND user_id = '%s'", user_id);
             ResultSet rs;
             rs = stm.executeQuery(query);
             resultado.add(new App(0, "Seleccione un aplicativo"));
@@ -55,7 +55,7 @@ public class Apps {
         try {
             Connection conn = db.getConnection();
             Statement stm = conn.createStatement();
-            String query = String.format("SELECT descripcion_menu FROM view_menus_autorizados WHERE estado = 'APROBADO' AND user_id = %s AND app_id = %s", user_id, app_id);
+            String query = String.format("SELECT descripcion_menu FROM view_menus_autorizados WHERE estado = 'ACTIVO' AND user_id = %s AND app_id = %s", user_id, app_id);
             ResultSet rs = stm.executeQuery(query);
             while (rs.next()) {
                 String[] row = new String[1];

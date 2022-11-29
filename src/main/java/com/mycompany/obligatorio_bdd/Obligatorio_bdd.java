@@ -22,28 +22,5 @@ public class Obligatorio_bdd {
     public static void main(String[] args) throws SQLException {
         FrmLogin frm = new FrmLogin();
         frm.setVisible(true);
-        DB db = new DB();
-        HashHelper hh = new HashHelper();
-        System.out.println(hh.crypt("1234", "Ignacio"));
-        
-//        Connection conn = null;
-//        
-//        String url = "jdbc:mariadb://localhost:3306/obligatorio";
-//        String db_user = "lukas";
-//        String db_pass = "q1w2e3r4";
-//        
-//        try{
-//            conn = DriverManager.getConnection(url,db_user,db_pass);
-//            System.out.println("Conectado");
-//            Statement stm = conn.createStatement();
-//            stm.executeUpdate("CREATE TABLE  sexo ( "
-//                     +"preg_id int NOT NULL AUTO_INCREMENT,"
-//                     +"pregunta TEXT NOT NULL, "
-//                     +"PRIMARY KEY(preg_id))" );
-//            stm.close();
-//            conn.close();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
     }
 }

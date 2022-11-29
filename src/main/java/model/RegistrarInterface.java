@@ -16,6 +16,7 @@ public interface RegistrarInterface {
     String getCiudad();
     String getDepartamento();
     int getPregunta();
+    int getApp();
     String getRespuesta();
     void showMsg(String msg);
 }
