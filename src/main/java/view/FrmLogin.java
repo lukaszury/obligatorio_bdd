@@ -97,8 +97,15 @@ public class FrmLogin extends javax.swing.JFrame implements LoginInterface {
             UserSession userSession = new UserSession();
             if (controller.ingresar(userSession)) {
                 this.setVisible(false);
-                FrmAplicativos formAplicativos = new FrmAplicativos(userSession);
-                formAplicativos.setVisible(true);
+                if (controller.isSuper(userSession)) {
+                    FrmManejoSolicitud formManejoSolicitudes = new FrmManejoSolicitud();
+                    FrmPermisosAppsRoles formPermisosAppsRoles = new FrmPermisosAppsRoles();
+                    formManejoSolicitudes.setVisible(true);
+                    formPermisosAppsRoles.setVisible(true);
+                } else {
+                    FrmAplicativos formAplicativos = new FrmAplicativos(userSession);
+                    formAplicativos.setVisible(true);
+                }
             } else {
                 this.mostrarMsg("Login error");
             }

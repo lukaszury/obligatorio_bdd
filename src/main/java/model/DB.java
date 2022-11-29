@@ -456,6 +456,25 @@ public class DB {
         }
         return changed;
     }
+    
+    public boolean isUserAllowed(int user_id)
+    {
+        boolean encontrado = false;
+        try {
+            conn = DriverManager.getConnection(url, db_user, db_pass);
+            Statement stm = conn.createStatement();
+            String query = String.format("SELECT p1.user_id FROM permisos p1 JOIN roles_negocio rn ON p1.rol_neg_id = rn.rol_neg_id WHERE p1.estado = 'APROBADO' AND rn.descripcion_rol_neg = 'Administrador' AND p1.user_id = %d GROUP BY p1.user_id" , user_id);
+            ResultSet rs = stm.executeQuery(query);
+            if (rs.next()) {
+                encontrado = rs.getBoolean(1);
+                stm.close();
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return encontrado;
+    }
 
     public ArrayList<String> obtenerRoles() {
         ArrayList<String> data = new ArrayList<String>();
