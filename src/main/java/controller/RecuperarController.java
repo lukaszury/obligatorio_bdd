@@ -33,10 +33,11 @@ public class RecuperarController {
     
     public void changePassword(){
         String name = ui.getUser();
+        String surname = ui.getPass();
         String response = ui.getResponse();
         String newPass = ui.getNewPass();
-        if(db.changePassword(response, name,newPass)) {
-            ui.showMsg("Su clave fue cambiada a 'asd' por favor cambiela lo antes posible");
+        if(db.changePassword(response, name,surname,newPass)) {
+            ui.showMsg("Su clave fue cambiada existosamente!");
         } else {
             ui.showMsg("Ocurrio un error, contactese con un administrador");
         }

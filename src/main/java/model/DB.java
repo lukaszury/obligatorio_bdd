@@ -318,7 +318,8 @@ public class DB {
                 id = Integer.parseInt(rs.getString(1));
                 System.out.println(id);
             }
-            String hashres = hashHelper.crypt(respuesta, nombre);
+            String salt = nombre+apellido;
+            String hashres = hashHelper.crypt(respuesta, salt);
             System.out.println(pregunta);
             query = String.format("INSERT INTO personas_preguntas (user_id, preg_id, respuesta) VALUES (%d, %d, '%s')", id, pregunta, hashres);
             stm.executeUpdate(query);
@@ -366,9 +367,10 @@ public class DB {
         return data;
     }
     
-    public boolean changePassword(String response,String name,String newPass){
+    public boolean changePassword(String response,String name,String surname,String newPass){
         boolean changed = false;
-        String hashres = hashHelper.crypt(response, name);
+        String salt = name+surname;
+        String hashres = hashHelper.crypt(response, salt);
         String hashpass = hashHelper.crypt(newPass, name);
         System.out.println(hashres);
         try {
